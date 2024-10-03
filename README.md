@@ -39,11 +39,6 @@ void main() async {
 }
 ```
 
-- Create instance of Firebase Auth
-```
-     FirebaseAuth auth = FirebaseAuth.instance;
-```
-
 - Register user using email/password
 ```
 final response = await Supabase.instance.client.auth.signUp(
