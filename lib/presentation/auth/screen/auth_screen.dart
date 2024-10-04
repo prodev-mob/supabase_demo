@@ -1,7 +1,6 @@
 import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_demo/presentation/home/screen/employees_list_screen.dart';
 import 'package:supabase_demo/navigation/route_name_constant.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -27,7 +26,7 @@ class _AuthScreenState extends State<AuthScreen> {
     if (response.user == null) {
       // print('Error: ${response.error!.message}');
     } else {
-      print('User signed up successfully!');
+      debugPrint('User signed up successfully!');
     }
   }
 
@@ -40,11 +39,8 @@ class _AuthScreenState extends State<AuthScreen> {
     if (response.user == null) {
       // print('Error: ${response.error!.message}');
     } else {
-      print('User signed in successfully!');
+      debugPrint('User signed in successfully!');
       // Navigate to HomePage after successful sign-in
-      // Navigator.of(context).pushReplacement(
-      //   MaterialPageRoute(builder: (context) => const EmployeeListScreen()),
-      // );
       context.go(RouteNameConstant.employeeList);
     }
   }
@@ -67,75 +63,75 @@ class _AuthScreenState extends State<AuthScreen> {
       );
 
       Future.delayed(
-        Duration(seconds: 20),
+        const Duration(seconds: 20),
         () {
           final url = html.window.location.href;
           Uri uri = Uri.parse(url);
           String baseUrl = '${uri.scheme}://${uri.host}:${uri.port}';
 
-          print("scheme : :: :: ::  ${uri.scheme}");
-          print("host : :: :: ::  ${uri.host}");
-          print("port : :: :: ::  ${uri.port}");
-          print("baseUrl : :: :: ::  ${baseUrl}");
+          debugPrint("scheme : :: :: ::  ${uri.scheme}");
+          debugPrint("host : :: :: ::  ${uri.host}");
+          debugPrint("port : :: :: ::  ${uri.port}");
+          debugPrint("baseUrl : :: :: ::  $baseUrl");
         },
       );
 
       if (response != true) {
-        print('Error signing in: ${response}');
+        debugPrint('Error signing in: $response');
       } else {
         // Navigator.of(context).pushReplacement(
         //   MaterialPageRoute(builder: (context) => const EmployeeListScreen()),
         // );
       }
     } catch (e) {
-      print('Error during Google sign-in: $e');
+      debugPrint('Error during Google sign-in: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Supabase Auth')),
+      appBar: AppBar(title: const Text('Supabase Auth')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(labelText: 'Email'),
             ),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
                 await signOutUser();
                 await signInUser(_emailController.text, _passwordController.text);
               },
-              child: Text('Sign In'),
+              child: const Text('Sign In'),
             ),
             ElevatedButton(
               onPressed: () async {
                 await signUpUser(_emailController.text, _passwordController.text);
               },
-              child: Text('Sign Up'),
+              child: const Text('Sign Up'),
             ),
-            SizedBox(
+            const SizedBox(
               height: 34,
             ),
             ElevatedButton(
               onPressed: _signInWithGoogle,
-              child: Text('Sign in with Google'),
+              child: const Text('Sign in with Google'),
             ),
-            SizedBox(
+            const SizedBox(
               height: 34,
             ),
             ElevatedButton(
               onPressed: signOutUser,
-              child: Text('Sign out'),
+              child: const Text('Sign out'),
             ),
           ],
         ),

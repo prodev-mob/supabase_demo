@@ -12,7 +12,7 @@ class EmployeeAttendanceScreen extends StatefulWidget {
   });
 
   @override
-  _EmployeeAttendanceScreenState createState() => _EmployeeAttendanceScreenState();
+  State<EmployeeAttendanceScreen> createState() => _EmployeeAttendanceScreenState();
 }
 
 class _EmployeeAttendanceScreenState extends State<EmployeeAttendanceScreen> {
@@ -50,7 +50,7 @@ class _EmployeeAttendanceScreenState extends State<EmployeeAttendanceScreen> {
         automaticallyImplyLeading: false,
       ),
       body: attendanceRecords.isEmpty
-          ? Center(child: Text('No attendance records found for this employee.'))
+          ? const Center(child: Text('No attendance records found for this employee.'))
           : ListView.builder(
               itemCount: attendanceRecords.length,
               itemBuilder: (context, index) {
@@ -62,13 +62,13 @@ class _EmployeeAttendanceScreenState extends State<EmployeeAttendanceScreen> {
                 return ListTile(
                   title: Text(
                     'Date: ${date.toLocal().toString().split(' ')[0]}',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (checkIn != null) Text('Check-in: ${checkIn}'),
-                      if (checkOut != null) Text('Check-out: ${checkOut}'),
+                      if (checkIn != null) Text('Check-in: $checkIn'),
+                      if (checkOut != null) Text('Check-out: $checkOut'),
                     ],
                   ),
                 );

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_demo/presentation/home/screen/add_employee_attendence_screen.dart';
-import 'package:supabase_demo/navigation/page/auth_go_route.dart';
 import 'package:supabase_demo/navigation/route_name_constant.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -68,7 +66,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                   title: Text(employee['name']),
                   subtitle: Text(employee['email']),
                   trailing: IconButton(
-                    icon: Icon(Icons.edit),
+                    icon: const Icon(Icons.edit),
                     onPressed: () {
                       context.go(
                         RouteNameConstant.addEmployeeAttendance.replaceFirst(":employeeID", employee['id']),

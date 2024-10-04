@@ -32,7 +32,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add New Employee'),
+        title: const Text('Add New Employee'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -41,7 +41,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
           child: Column(
             children: [
               TextFormField(
-                decoration: InputDecoration(labelText: 'Name'),
+                decoration: const InputDecoration(labelText: 'Name'),
                 onChanged: (value) => name = value,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -51,7 +51,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Email'),
                 onChanged: (value) => email = value,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -60,14 +60,14 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _addEmployee();
                   }
                 },
-                child: Text('Add Employee'),
+                child: const Text('Add Employee'),
               ),
             ],
           ),

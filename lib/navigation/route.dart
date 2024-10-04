@@ -21,7 +21,7 @@ class Routes {
         redirect: (BuildContext context, GoRouterState state) async {
           User? isUserLogged = Supabase.instance.client.auth.currentUser;
 
-          print("IsUserLogged :: :: :: :: :: ${isUserLogged?.toJson()}");
+          debugPrint("IsUserLogged :: :: :: :: :: ${isUserLogged?.toJson()}");
           return isUserLogged != null
               ? RouteNameConstant.employeeList
               : RouteNameConstant.auth;
