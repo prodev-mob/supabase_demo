@@ -1,3 +1,4 @@
+import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -43,7 +44,8 @@ class _AddEditAttendanceScreenState extends State<AddEditAttendanceScreen> {
     }).select();
 
     if (response.isNotEmpty) {
-      Navigator.pop(context); // Go back to the previous screen
+       // Go back to the previous screen
+      window.history.back();
     } else {
       // print('Error adding/editing attendance: ${response.error?.message}');
     }

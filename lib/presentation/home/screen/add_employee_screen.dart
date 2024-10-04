@@ -1,3 +1,4 @@
+import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -21,7 +22,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
     }).select();
 
     if (response.isNotEmpty) {
-      Navigator.pop(context);  // Return to the Employee List screen after adding
+      window.history.back();  // Return to the Employee List screen after adding
     } else {
       // print('Error adding employee: ${response.error?.message}');
     }
@@ -40,7 +41,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
           child: Column(
             children: [
               TextFormField(
-                decoration: InputDecoration(labelText: '12'),
+                decoration: InputDecoration(labelText: 'Name'),
                 onChanged: (value) => name = value,
                 validator: (value) {
                   if (value == null || value.isEmpty) {

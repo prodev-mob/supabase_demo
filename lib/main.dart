@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_demo/authentication_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_demo/navigation/route.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'add_employee_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,17 +11,43 @@ void main() async {
     anonKey:
         'ADD-YOUR-ANON-KEY',
   );
-  runApp(MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: SignInPage(),
-      routes: {
-        '/add_employee': (context) => const AddEmployeeScreen(),
+    return Consumer(
+      builder: (context, ref, child) {
+        return MaterialApp.router(
+          routerConfig: ref.read(Routes.rootRouter),
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            dividerColor: const Color(0xffC0C0C0),
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.android: _NoAnimationTransition(),
+              TargetPlatform.iOS: _NoAnimationTransition(),
+              // if you have more you can add them here
+            }),
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xff141414),
+              primary: const Color(0xff0076FA),
+            ),
+            useMaterial3: true,
+          ),
+        );
       },
     );
   }
+}
+
+class _NoAnimationTransition extends PageTransitionsBuilder {
+  @override
+  Widget buildTransitions<T>(_, __, ___, ____, Widget child) => child;
 }

@@ -5,7 +5,11 @@ class EmployeeAttendanceScreen extends StatefulWidget {
   final String employeeId;
   final String employeeName;
 
-  EmployeeAttendanceScreen({required this.employeeId, required this.employeeName});
+  const EmployeeAttendanceScreen({
+    super.key,
+    required this.employeeId,
+    required this.employeeName,
+  });
 
   @override
   _EmployeeAttendanceScreenState createState() => _EmployeeAttendanceScreenState();
@@ -43,32 +47,33 @@ class _EmployeeAttendanceScreenState extends State<EmployeeAttendanceScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.employeeName} Attendance'),
+        automaticallyImplyLeading: false,
       ),
       body: attendanceRecords.isEmpty
           ? Center(child: Text('No attendance records found for this employee.'))
           : ListView.builder(
-        itemCount: attendanceRecords.length,
-        itemBuilder: (context, index) {
-          final record = attendanceRecords[index];
-          final date = DateTime.parse(record['date']);
-          final checkIn = record['check_in'] ;
-          final checkOut = record['check_out'];
+              itemCount: attendanceRecords.length,
+              itemBuilder: (context, index) {
+                final record = attendanceRecords[index];
+                final date = DateTime.parse(record['date']);
+                final checkIn = record['check_in'];
+                final checkOut = record['check_out'];
 
-          return ListTile(
-            title: Text(
-              'Date: ${date.toLocal().toString().split(' ')[0]}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+                return ListTile(
+                  title: Text(
+                    'Date: ${date.toLocal().toString().split(' ')[0]}',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (checkIn != null) Text('Check-in: ${checkIn}'),
+                      if (checkOut != null) Text('Check-out: ${checkOut}'),
+                    ],
+                  ),
+                );
+              },
             ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (checkIn != null) Text('Check-in: ${checkIn}'),
-                if (checkOut != null) Text('Check-out: ${checkOut}'),
-              ],
-            ),
-          );
-        },
-      ),
     );
   }
 }

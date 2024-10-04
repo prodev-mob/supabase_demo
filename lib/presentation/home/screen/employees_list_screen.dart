@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_demo/add_employee_attendence_screen.dart';
-import 'package:supabase_demo/employee_attendance_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:supabase_demo/presentation/home/screen/add_employee_attendence_screen.dart';
+import 'package:supabase_demo/navigation/page/auth_go_route.dart';
+import 'package:supabase_demo/navigation/route_name_constant.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmployeeListScreen extends StatefulWidget {
@@ -26,7 +28,6 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
   Future<void> _fetchEmployees() async {
     final response = await Supabase.instance.client.from('employees').select();
 
-    print("Response :: :: : : : : $response");
     if (response.isNotEmpty) {
       setState(() {
         employees = response;
@@ -38,10 +39,27 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Employee List'),
+        title: const Text('Employee List'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 26),
+            child: IconButton(
+              onPressed: () async {
+                await Supabase.instance.client.auth.signOut();
+                context.go(RouteNameConstant.auth);
+              },
+              icon: const Icon(
+                Icons.logout,
+                size: 24,
+              ),
+            ),
+          ),
+        ],
       ),
       body: employees.isEmpty
-          ? Center(child: Text('No employees found.'))
+          ? const Center(
+              child: Text('No employees found.'),
+            )
           : ListView.builder(
               itemCount: employees.length,
               itemBuilder: (context, index) {
@@ -52,26 +70,16 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                   trailing: IconButton(
                     icon: Icon(Icons.edit),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddEditAttendanceScreen(
-                            employeeId: employee['id'],
-                            employeeName: employee['name'],
-                          ),
-                        ),
+                      context.go(
+                        RouteNameConstant.addEmployeeAttendance.replaceFirst(":employeeID", employee['id']),
+                        extra: employee['name'],
                       );
                     },
                   ),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EmployeeAttendanceScreen(
-                          employeeId: employee['id'],
-                          employeeName: employee['name'],
-                        ),
-                      ),
+                    context.go(
+                      RouteNameConstant.employeeAttendance.replaceFirst(":employeeID", employee['id']),
+                      extra: employee['name'],
                     );
                   },
                 );
@@ -79,9 +87,9 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/add_employee').then((value) => _fetchEmployees());
+          context.go(RouteNameConstant.addEmployee);
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
