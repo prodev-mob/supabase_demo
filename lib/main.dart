@@ -8,8 +8,7 @@ void main() async {
 
   await Supabase.initialize(
     url: 'ADD_YOUR_URL',
-    anonKey:
-        'ADD-YOUR-ANON-KEY',
+    anonKey: 'ADD-YOUR-ANON-KEY',
   );
   runApp(
     const ProviderScope(

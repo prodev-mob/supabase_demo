@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_demo/presentation/chat/screen/chat_screen.dart';
+import 'package:supabase_demo/presentation/chat/screen/users_list_screen.dart';
 import 'package:supabase_demo/presentation/home/screen/add_employee_attendence_screen.dart';
 import 'package:supabase_demo/presentation/home/screen/add_employee_screen.dart';
 import 'package:supabase_demo/presentation/home/screen/employee_attendance_screen.dart';
@@ -74,6 +76,36 @@ class AppRoute {
       return const CupertinoPage(
         key: ValueKey("AddEmployeeScreen-Page"),
         child: AddEmployeeScreen(),
+      );
+    },
+  );
+
+  static final chatUsers = GoRoute(
+    path: RouteNameConstant.chatUsers,
+    redirect: Routes.redirectIfLoggedOut(),
+    pageBuilder: (context, state) {
+      return const CupertinoPage(
+        key: ValueKey("UsersListScreen-Page"),
+        child: UsersListScreen(),
+      );
+    },
+  );
+
+  static final chatRoom = GoRoute(
+    path: RouteNameConstant.chatRoom,
+    redirect: Routes.redirectIfLoggedOut(),
+    pageBuilder: (context, state) {
+      final chatRoomAndUserId = state.pathParameters['chatRoomAndUserId'] ?? "";
+
+      final chatRoomId = chatRoomAndUserId.split("--").first;
+      final otherUserId = chatRoomAndUserId.split("--").last;
+
+      return CupertinoPage(
+        key: const ValueKey("ChatScreen-Page"),
+        child: ChatScreen(
+          chatRoomId: chatRoomId,
+          otherUserId: otherUserId,
+        ),
       );
     },
   );

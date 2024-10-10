@@ -42,6 +42,8 @@ class Routes {
         AppRoute.employeeAttendance,
         AppRoute.addEmployeeAttendance,
         AppRoute.addEmployee,
+        AppRoute.chatUsers,
+        AppRoute.chatRoom,
       ],
     ),
   );
