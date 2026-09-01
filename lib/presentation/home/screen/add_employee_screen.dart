@@ -1,5 +1,6 @@
-import 'dart:html';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:supabase_demo/navigation/route_name_constant.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AddEmployeeScreen extends StatefulWidget {
@@ -16,15 +17,33 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   String email = '';
 
   Future<void> _addEmployee() async {
-    final response = await supabase.from('employees').insert({
-      'name': name,
-      'email': email,
-    }).select();
+    try {
+      final response = await supabase.from('employees').insert({
+        'name': name,
+        'email': email,
+      }).select();
 
-    if (response.isNotEmpty) {
-      window.history.back();  // Return to the Employee List screen after adding
-    } else {
-      // print('Error adding employee: ${response.error?.message}');
+      if (response.isNotEmpty) {
+        if (!mounted) return;
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go(RouteNameConstant.employeeList);
+        }
+      }
+    } on PostgrestException catch (e) {
+      final errorMsg = e.message.isNotEmpty ? e.message : (e.details?.toString() ?? e.code ?? 'Unknown database error');
+      debugPrint('Postgrest error adding employee: code=${e.code}, message=${e.message}, details=${e.details}, hint=${e.hint}');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Database error ($errorMsg)')),
+      );
+    } catch (e) {
+      debugPrint('Error adding employee: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error adding employee: $e')),
+      );
     }
   }
 

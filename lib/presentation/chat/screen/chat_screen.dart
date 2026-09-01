@@ -55,7 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
         curve: Curves.easeIn,
       );
     } else {
-      print('Error fetching messages:');
+      debugPrint('Error fetching messages:');
     }
   }
 

@@ -1,6 +1,7 @@
-import 'dart:html';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_demo/navigation/route_name_constant.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AddEditAttendanceScreen extends StatefulWidget {
@@ -36,18 +37,35 @@ class _AddEditAttendanceScreenState extends State<AddEditAttendanceScreen> {
       checkOutTime!.minute,
     );
 
-    final response = await supabase.from('attendance').insert({
-      'employee_id': widget.employeeId,
-      'date': DateFormat("yyyy-MM-dd").format(selectedDate!),
-      'check_in': DateFormat("hh:mm:ss").format(checkInDateTime),
-      'check_out': DateFormat("hh:mm:ss").format(checkOutDateTime),
-    }).select();
+    try {
+      final response = await supabase.from('attendance').insert({
+        'employee_id': widget.employeeId,
+        'date': DateFormat("yyyy-MM-dd").format(selectedDate!),
+        'check_in': DateFormat("hh:mm:ss").format(checkInDateTime),
+        'check_out': DateFormat("hh:mm:ss").format(checkOutDateTime),
+      }).select();
 
-    if (response.isNotEmpty) {
-       // Go back to the previous screen
-      window.history.back();
-    } else {
-      // print('Error adding/editing attendance: ${response.error?.message}');
+      if (response.isNotEmpty) {
+        // Go back to the previous screen
+        if (!mounted) return;
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go(RouteNameConstant.employeeList);
+        }
+      }
+    } on PostgrestException catch (e) {
+      debugPrint('Postgrest error adding attendance: ${e.message}');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Database error: ${e.message}')),
+      );
+    } catch (e) {
+      debugPrint('Error adding attendance: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error adding attendance: $e')),
+      );
     }
   }
 

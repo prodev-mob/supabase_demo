@@ -1,152 +1,170 @@
-# supabase_demo
+# Supabase Demo Flutter App
 
-This Flutter application demonstrates SupaBase Authentication & DataBase.
+A Flutter application demonstrating **Supabase Authentication**, **Database Operations (CRUD)**, and **Realtime Chat with PostgreSQL Channels**.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## Tech Stack & Requirements
+
+- **Flutter SDK**: `3.38.7` (Dart `3.10.7`) managed via [FVM (Flutter Version Management)](https://fvm.app/)
+- **Android Gradle Plugin (AGP)**: `8.11.1`
+- **Gradle**: `8.14`
+- **Kotlin**: `2.2.20`
+- **Java**: `17`
+- **Backend / Database**: [Supabase](https://supabase.com/) (Auth, PostgreSQL, Realtime)
+
+---
 
 ## Features
-- Employee authentication using email/password.
-- Create & Read Empolyee attendance data like Date, Check-In Time , Check-Out Time.
-- Implement chat using real time Databaese.
+
+- **Authentication**: Email/Password authentication & Google OAuth sign-in via Supabase Auth.
+- **Employee Management**: Create, read, and manage employee records.
+- **Attendance Tracking**: Track check-in and check-out attendance for each employee with date-sorted logs.
+- **Realtime Chat**: 1-to-1 realtime messaging with Supabase PostgreSQL channel subscriptions.
+- **Navigation**: Declarative routing with GoRouter.
+- **State Management**: Riverpod for reactive state.
+
+---
 
 ## Getting Started
 
-1) Check official SupaBase Documents for configure SupaBase in your Project.
-https://supabase.com/docs/guides/getting-started/quickstarts/flutter
+### 1. Flutter Version Management (FVM) Setup
 
+Ensure FVM is installed, then configure the project:
 
-2) Dependencies
+```bash
+# Install and use Flutter 3.38.7
+fvm use 3.38.7
 
-    Add below dependencies in pubspec.yaml
+# Install project dependencies
+fvm flutter pub get
 ```
-dependencies:
-  supabase_flutter: ^2.0.0
+
+### 2. Supabase Project Setup
+
+1. Create a project at [Supabase](https://supabase.com/).
+2. Open the **SQL Editor** in your Supabase Dashboard and run the following schema to create tables and configure Row-Level Security (RLS):
+
+```sql
+-- 1. Users table
+CREATE TABLE IF NOT EXISTS public.users (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    profile_pic TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 2. Employees table
+CREATE TABLE IF NOT EXISTS public.employees (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 3. Attendance table
+CREATE TABLE IF NOT EXISTS public.attendance (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    employee_id UUID REFERENCES public.employees(id) ON DELETE CASCADE,
+    date DATE NOT NULL,
+    check_in TIME,
+    check_out TIME,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 4. Chat Rooms table
+CREATE TABLE IF NOT EXISTS public.chat_rooms (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user1 TEXT NOT NULL,
+    user2 TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 5. Chat Messages table
+CREATE TABLE IF NOT EXISTS public.chat_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    chat_room_id UUID REFERENCES public.chat_rooms(id) ON DELETE CASCADE,
+    sender_id TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS and add access policies
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.employees ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.attendance ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_rooms ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all users access" ON public.users FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all employees access" ON public.employees FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all attendance access" ON public.attendance FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all chat_rooms access" ON public.chat_rooms FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all chat_messages access" ON public.chat_messages FOR ALL USING (true) WITH CHECK (true);
 ```
 
-4) Code Setup
+### 3. Configure Supabase Credentials
 
-- initialize SupaBase Client in your main.dart
-```
+Update your Supabase URL and Publishable/Anon Key in [`lib/main.dart`](lib/main.dart):
+
+```dart
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
-    url: 'ADD_YOUR_URL',
-    anonKey: 'ADD-YOUR-ANON-KEY',
+    url: 'YOUR_SUPABASE_PROJECT_URL',       // e.g. https://xyzcompany.supabase.co
+    publishableKey: 'YOUR_SUPABASE_KEY',    // e.g. sb_publishable_... or anon key
   );
-  runApp(MyApp());
+
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 ```
 
-- Register user using email/password
-```
-final response = await Supabase.instance.client.auth.signUp(
-      email: email,
-      password: password,
-    );
+---
+
+## Dependencies
+
+Key dependencies configured in [`pubspec.yaml`](pubspec.yaml):
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.9
+  supabase_flutter: ^2.17.2
+  intl: ^0.20.3
+  go_router: ^17.5.0
+  flutter_secure_storage: ^11.0.0
+  flutter_riverpod: ^2.6.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
 ```
 
-- Login user using email/password
-```
-final response = await Supabase.instance.client.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
-```
+---
 
-- Sign Out
-```
-  await Supabase.instance.client.auth.signOut();
-```
+## Running the App
 
-- add users after Signup in users Tabel
-```
-  
-        await supabase.from('users').insert({
-          'id': userId,
-          'name': name,
-          'email': email,
-          'profile_pic': image,
-        });
+```bash
+# Run on connected device / emulator
+fvm flutter run
 
-```
-- Fetch chat user's list.
-```
- 
-    final response = await supabase.from('users').select('id, name, profile_pic').not('id', 'eq', loggedInUserId);
+# Run static analysis
+fvm flutter analyze
+
+# Run tests
+fvm flutter test
 ```
 
-- If chat room is exist  then it open Direct chat room otherwise it's create new chat room.
-```
-Future<void> _startChat(String otherUserId) async {
-    // Check if chat room already exists
+---
 
-    final response = await supabase
-        .from('chat_rooms')
-        .select('id')
-        .or('and(user1.eq.$loggedInUserId,user2.eq.$otherUserId),and(user1.eq.$otherUserId,user2.eq.$loggedInUserId)');
-
-
-    if (response.isEmpty) {
-      // No chat room exists, create one
-      await supabase.from('chat_rooms').insert({
-        'user1': loggedInUserId,
-        'user2': otherUserId,
-        'created_at': DateTime.now().toIso8601String(),
-      });
-
-      final response = await supabase
-          .from('chat_rooms')
-          .select('id')
-          .or('and(user1.eq.$loggedInUserId,user2.eq.$otherUserId),and(user1.eq.$otherUserId,user2.eq.$loggedInUserId)');
-
-      if ((response.first["id"] ?? "").toString().isNotEmpty) {
-        // Navigate to the chat room screen
-        context.go(
-          RouteNameConstant.chatRoom.replaceFirst(":chatRoomAndUserId", "${response.first["id"]}--$otherUserId"),
-        );
-      }
-    } else {
-      if ((response.first["id"] ?? "").toString().isNotEmpty) {
-        // Navigate to the chat room screen
-        context.go(
-          RouteNameConstant.chatRoom.replaceFirst(":chatRoomAndUserId", "${response.first["id"]}--$otherUserId"),
-        );
-      }
-    }
-  }
-```
-- Listen all new Messages
-```
-  void _subscribeToRealTimeMessages() {
-    supabase
-        .channel('chat_messages')
-        .onPostgresChanges(
-            event: PostgresChangeEvent.all,
-            schema: 'public',
-            table: 'chat_messages',
-            filter: PostgresChangeFilter(
-              type: PostgresChangeFilterType.eq,
-              column: 'chat_room_id',
-              value: widget.chatRoomId,
-            ),
-            callback: (PostgresChangePayload payload) {
-              final Map<String, dynamic> newRecord = payload.newRecord;
-
-            
-              setState(() {
-                messages.add(payload.newRecord);
-              });
-            })
-        .subscribe();
-  }
-```
-
-
-## Videos
+## Demo Video
 
 https://github.com/user-attachments/assets/139fe8e7-c4dc-4bea-ac6c-ffd186461cab
-
-

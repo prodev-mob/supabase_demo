@@ -31,11 +31,11 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     final User? user = supabase.auth.currentUser;
 
     if (user == null) {
-      print('No user is currently logged in.');
+      debugPrint('No user is currently logged in.');
       return;
     }
 
-    print("Name :: :: :: :: ${user.toJson()}");
+    debugPrint("Name :: :: :: :: ${user.toJson()}");
 
     final String email = user.email ?? '';
     final String userId = user.id;
@@ -48,7 +48,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
 
       if (response.isNotEmpty) {
         // User already exists in the table
-        print('User with email $email already exists. No need to insert.');
+        debugPrint('User with email $email already exists. No need to insert.');
       } else {
         // User doesn't exist, insert the new user data into the 'users' table
         await supabase.from('users').insert({
@@ -58,20 +58,24 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
           'profile_pic': image,
         });
 
-        print('New user inserted with email $email.');
+        debugPrint('New user inserted with email $email.');
       }
     } catch (e) {
-      print('Error during user check and insertion: $e');
+      debugPrint('Error during user check and insertion: $e');
     }
   }
 
   Future<void> _fetchEmployees() async {
-    final response = await Supabase.instance.client.from('employees').select();
+    try {
+      final response = await Supabase.instance.client.from('employees').select();
 
-    if (response.isNotEmpty) {
-      setState(() {
-        employees = response;
-      });
+      if (response.isNotEmpty) {
+        setState(() {
+          employees = response;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching employees: $e');
     }
   }
 
@@ -86,6 +90,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
             child: IconButton(
               onPressed: () async {
                 await Supabase.instance.client.auth.signOut();
+                if (!context.mounted) return;
                 context.go(RouteNameConstant.auth);
               },
               icon: const Icon(
@@ -109,15 +114,16 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                   subtitle: Text(employee['email']),
                   trailing: IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      context.go(
+                    onPressed: () async {
+                      await context.push(
                         RouteNameConstant.addEmployeeAttendance.replaceFirst(":employeeID", employee['id']),
                         extra: employee['name'],
                       );
+                      _fetchEmployees();
                     },
                   ),
                   onTap: () {
-                    context.go(
+                    context.push(
                       RouteNameConstant.employeeAttendance.replaceFirst(":employeeID", employee['id']),
                       extra: employee['name'],
                     );
@@ -131,8 +137,9 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             InkWell(
-              onTap: () {
-                context.go(RouteNameConstant.addEmployee);
+              onTap: () async {
+                await context.push(RouteNameConstant.addEmployee);
+                _fetchEmployees();
               },
               child: Container(
                 height: 52,
@@ -154,7 +161,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
             ),
             InkWell(
               onTap: () {
-                context.go(RouteNameConstant.chatUsers);
+                context.push(RouteNameConstant.chatUsers);
               },
               child: Container(
                 height: 52,

@@ -47,7 +47,6 @@ class _EmployeeAttendanceScreenState extends State<EmployeeAttendanceScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.employeeName} Attendance'),
-        automaticallyImplyLeading: false,
       ),
       body: attendanceRecords.isEmpty
           ? const Center(child: Text('No attendance records found for this employee.'))

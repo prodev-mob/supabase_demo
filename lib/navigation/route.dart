@@ -16,7 +16,7 @@ class Routes {
 
   static BuildContext? get currentContext => rootKey.currentContext;
 
-  static root(ProviderRef<Object?> ref) => GoRoute(
+  static GoRoute root(Ref ref) => GoRoute(
         path: RouteNameConstant.root,
         redirect: (BuildContext context, GoRouterState state) async {
           User? isUserLogged = Supabase.instance.client.auth.currentUser;

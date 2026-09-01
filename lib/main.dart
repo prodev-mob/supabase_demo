@@ -8,7 +8,7 @@ void main() async {
 
   await Supabase.initialize(
     url: 'ADD_YOUR_URL',
-    anonKey: 'ADD-YOUR-ANON-KEY',
+    publishableKey: 'ADD-YOUR-PUBLISHABLE-KEY',
   );
   runApp(
     const ProviderScope(
@@ -48,5 +48,12 @@ class MyApp extends StatelessWidget {
 
 class _NoAnimationTransition extends PageTransitionsBuilder {
   @override
-  Widget buildTransitions<T>(_, __, ___, ____, Widget child) => child;
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) =>
+      child;
 }

@@ -37,13 +37,13 @@ class _UsersListScreenState extends State<UsersListScreen> {
     final response = await supabase.from('users').select('id, name, profile_pic').not('id', 'eq', loggedInUserId);
 
     if (response.isNotEmpty) {
-      print("All Users :: $response");
+      debugPrint("All Users :: $response");
 
       setState(() {
         users = List<Map<String, dynamic>>.from(response);
       });
     } else {
-      print('Error fetching users:');
+      debugPrint('Error fetching users:');
     }
   }
 
@@ -55,7 +55,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
         .select('id')
         .or('and(user1.eq.$loggedInUserId,user2.eq.$otherUserId),and(user1.eq.$otherUserId,user2.eq.$loggedInUserId)');
 
-    print("chat_rooms :: :: :: :: : $response");
+    debugPrint("chat_rooms :: :: :: :: : $response");
 
     if (response.isEmpty) {
       // No chat room exists, create one
@@ -70,7 +70,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
           .select('id')
           .or('and(user1.eq.$loggedInUserId,user2.eq.$otherUserId),and(user1.eq.$otherUserId,user2.eq.$loggedInUserId)');
 
-      print("chat_rooms :: :: :: :: : $response");
+      debugPrint("chat_rooms :: :: :: :: : $response");
 
       if ((response.first["id"] ?? "").toString().isNotEmpty) {
         // Navigate to the chat room screen
@@ -85,7 +85,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
   }
 
   void _navigateToChatRoom(String otherUserId, String chatRoomId) {
-    context.go(
+    context.push(
       RouteNameConstant.chatRoom.replaceFirst(":chatRoomAndUserId", "$chatRoomId--$otherUserId"),
     );
   }
